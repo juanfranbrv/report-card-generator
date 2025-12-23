@@ -1,0 +1,5 @@
+{
+  "name": "Report Card Generator",
+  "description": "An interactive tool for teachers to create and export stylized student report cards that match the 'Bauset' worksheet aesthetic, featuring AI-assisted comments.",
+  "requestFramePermissions": []
+}
