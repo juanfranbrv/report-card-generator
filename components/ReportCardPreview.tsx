@@ -4,9 +4,10 @@ import { ReportData } from '../types';
 
 interface Props {
   data: ReportData;
+  isInfantil?: boolean;
 }
 
-const ReportCardPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
+const ReportCardPreview = forwardRef<HTMLDivElement, Props>(({ data, isInfantil = false }, ref) => {
   return (
     <div
       ref={ref}
@@ -71,18 +72,22 @@ const ReportCardPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                   <span className="-mt-1">{data.grades.writing}</span>
                 </div>
               </div>
-              <div className="border-r-[3px] border-b-[3px] border-gray-800 p-3 font-bold text-xl">Listening</div>
-              <div className="border-b-[3px] border-gray-800 p-2 bg-gray-400">
-                <div className="bg-white border-2 border-gray-800 rounded-full h-8 px-4 flex items-center justify-center font-bold text-xl leading-none pt-0">
-                  <span className="-mt-1">{data.grades.listening}</span>
-                </div>
-              </div>
-              <div className="border-r-[3px] border-gray-800 p-3 font-bold text-xl">Speaking</div>
-              <div className="p-2 bg-gray-400">
-                <div className="bg-white border-2 border-gray-800 rounded-full h-8 px-4 flex items-center justify-center font-bold text-xl leading-none pt-0">
-                  <span className="-mt-1">{data.grades.speaking}</span>
-                </div>
-              </div>
+              {!isInfantil && (
+                <>
+                  <div className="border-r-[3px] border-b-[3px] border-gray-800 p-3 font-bold text-xl">Listening</div>
+                  <div className="border-b-[3px] border-gray-800 p-2 bg-gray-400">
+                    <div className="bg-white border-2 border-gray-800 rounded-full h-8 px-4 flex items-center justify-center font-bold text-xl leading-none pt-0">
+                      <span className="-mt-1">{data.grades.listening}</span>
+                    </div>
+                  </div>
+                  <div className="border-r-[3px] border-gray-800 p-3 font-bold text-xl">Speaking</div>
+                  <div className="p-2 bg-gray-400">
+                    <div className="bg-white border-2 border-gray-800 rounded-full h-8 px-4 flex items-center justify-center font-bold text-xl leading-none pt-0">
+                      <span className="-mt-1">{data.grades.speaking}</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

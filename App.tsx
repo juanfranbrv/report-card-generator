@@ -32,6 +32,7 @@ const GRADE_OPTIONS = ['', 'A', 'B', 'C', 'D', 'E'];
 const App: React.FC = () => {
   const [data, setData] = useState<ReportData>(initialData);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isInfantil, setIsInfantil] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -164,29 +165,45 @@ const App: React.FC = () => {
           </section>
 
           <section className="space-y-4">
-            <h2 className="font-semibold text-gray-700 border-b pb-1">Calificaciones (A-E)</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {(Object.keys(data.grades) as Array<keyof typeof data.grades>).map((gradeKey) => (
-                <div key={String(gradeKey)}>
-                  <label className="block text-sm text-gray-500 capitalize">
-                    {gradeKey === 'reading' ? 'Lectura' :
-                      gradeKey === 'writing' ? 'Escritura' :
-                        gradeKey === 'listening' ? 'Comprensión Auditiva' : 'Expresión Oral'}
-                  </label>
-                  <select
-                    name={`grades.${String(gradeKey)}`}
-                    value={data.grades[gradeKey]}
-                    onChange={handleInputChange}
-                    className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none bg-white"
-                  >
-                    {GRADE_OPTIONS.map(opt => (
-                      <option key={opt} value={opt}>
-                        {opt || 'Seleccionar nota...'}
-                      </option>
-                    ))}
-                  </select>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold text-gray-700 border-b pb-1 flex-1">Calificaciones (A-E)</h2>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <span className="text-sm text-gray-600">Infantil</span>
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={isInfantil}
+                    onChange={(e) => setIsInfantil(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </div>
-              ))}
+              </label>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {(Object.keys(data.grades) as Array<keyof typeof data.grades>)
+                .filter(gradeKey => !isInfantil || (gradeKey !== 'listening' && gradeKey !== 'speaking'))
+                .map((gradeKey) => (
+                  <div key={String(gradeKey)}>
+                    <label className="block text-sm text-gray-500 capitalize">
+                      {gradeKey === 'reading' ? 'Lectura' :
+                        gradeKey === 'writing' ? 'Escritura' :
+                          gradeKey === 'listening' ? 'Comprensión Auditiva' : 'Expresión Oral'}
+                    </label>
+                    <select
+                      name={`grades.${String(gradeKey)}`}
+                      value={data.grades[gradeKey]}
+                      onChange={handleInputChange}
+                      className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none bg-white"
+                    >
+                      {GRADE_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>
+                          {opt || 'Seleccionar nota...'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
             </div>
           </section>
 
@@ -258,7 +275,7 @@ const App: React.FC = () => {
       {/* Preview Section */}
       <div className="flex-1 overflow-auto flex justify-center bg-gray-200 p-8 min-h-screen">
         <div className="h-fit">
-          <ReportCardPreview data={data} ref={previewRef} />
+          <ReportCardPreview data={data} isInfantil={isInfantil} ref={previewRef} />
         </div>
       </div>
     </div>
