@@ -3,8 +3,14 @@ import { GoogleGenAI } from "@google/genai";
 import { ReportData } from "../types";
 
 export const generateFeedback = async (data: ReportData): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("API Key not configured. Please set VITE_GEMINI_API_KEY in .env.local");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
   const prompt = `
     Como profesor/a profesional, escribe un comentario de feedback personalizado, constructivo y alentador para el boletín de notas de un estudiante.
     
