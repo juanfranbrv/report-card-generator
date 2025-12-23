@@ -22,7 +22,7 @@ const ReportCardPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           </h1>
         </div>
         <div className="w-40 text-right">
-          <img src="/logoweb1.png" alt="Bauset Centro de Estudios" className="w-full h-auto" />
+          <img src={`${import.meta.env.BASE_URL}logoweb1.png`} alt="Bauset Centro de Estudios" className="w-full h-auto" />
         </div>
       </div>
 
