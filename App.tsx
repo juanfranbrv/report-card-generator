@@ -250,7 +250,7 @@ const App: React.FC = () => {
             >
               <Download className="w-6 h-6" /> Imprimir / Guardar como PDF
             </button>
-            <p className="text-xs text-gray-500 text-center">Usa Ctrl+P o ⌘+P, luego selecciona "Guardar como PDF"</p>
+            <p className="text-xs text-gray-400 text-center">Creado por juanfranbrv with ❤️</p>
           </div>
         </div>
       </div>
