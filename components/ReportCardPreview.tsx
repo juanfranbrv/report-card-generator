@@ -88,7 +88,7 @@ const ReportCardPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         </div>
 
         {/* Grading System Sticky Note */}
-        <div className="w-48 relative">
+        <div className="w-48 relative mt-10">
           <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-5 bg-gray-300 border border-gray-800/20 z-10 rotate-1 shadow-sm"></div>
           <div className="bg-white border-[3px] border-gray-800 p-4 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.1)] relative mt-2 rounded-sm">
             <h3 className="font-bold text-center underline mb-2 text-sm leading-none">Grading System</h3>

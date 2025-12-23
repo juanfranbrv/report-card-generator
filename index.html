@@ -45,18 +45,41 @@
         background: white !important;
       }
 
-      /* Asegurar que el área de preview no añada fondo ni padding */
       #root>div {
         padding: 0 !important;
         margin: 0 !important;
         background: white !important;
       }
 
-      /* Escalar para que quepa todo el contenido sin cortar */
+      /* Ajuste final optimizado */
       #report-card-capture {
-        transform: scale(0.88);
-        transform-origin: top center;
-        margin-bottom: -40mm;
+        min-height: auto !important;
+        max-height: 297mm !important;
+        padding: 3mm 7mm 7mm 7mm !important;
+        font-size: 17px !important;
+      }
+
+      #report-card-capture h1 {
+        font-size: 42px !important;
+        margin-bottom: 10px !important;
+      }
+
+      #report-card-capture h2 {
+        font-size: 26px !important;
+        margin-bottom: 6px !important;
+      }
+
+      #report-card-capture .mb-4 {
+        margin-bottom: 10px !important;
+      }
+
+      #report-card-capture .mb-6 {
+        margin-bottom: 12px !important;
+      }
+
+      #report-card-capture p {
+        font-size: 17px !important;
+        line-height: 1.4 !important;
       }
     }
   </style>
