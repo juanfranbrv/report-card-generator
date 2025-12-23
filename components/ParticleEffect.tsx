@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import * as THREE from 'three';
 
 interface ParticleEffectProps {
@@ -6,180 +6,199 @@ interface ParticleEffectProps {
 }
 
 const ParticleEffect: React.FC<ParticleEffectProps> = ({ isActive }) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const sceneRef = useRef<THREE.Scene | null>(null);
-    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-    const particlesRef = useRef<THREE.Points | null>(null);
-    const animationIdRef = useRef<number | null>(null);
-
     useEffect(() => {
-        if (!canvasRef.current || !isActive) {
-            // Cleanup if toggled off
-            if (animationIdRef.current) {
-                cancelAnimationFrame(animationIdRef.current);
-            }
-            if (rendererRef.current) {
-                rendererRef.current.dispose();
-            }
+        const canvas = document.getElementById('logo-particles') as HTMLCanvasElement;
+
+        if (!canvas || !isActive) {
             return;
         }
 
-        const canvas = canvasRef.current;
         const scene = new THREE.Scene();
-        sceneRef.current = scene;
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        camera.position.z = 25;
 
-        // Camera
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            canvas.clientWidth / canvas.clientHeight,
-            0.1,
-            1000
-        );
-        camera.position.z = 30;
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Renderer
-        const renderer = new THREE.WebGLRenderer({
-            canvas,
-            alpha: true,
-            antialias: true,
-        });
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        rendererRef.current = renderer;
+        const updateRendererSize = () => {
+            if (canvas.clientWidth && canvas.clientHeight) {
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                camera.updateProjectionMatrix();
+            }
+        };
+        updateRendererSize();
 
-        // Create particles
-        const particleCount = 150;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-        const sizes = new Float32Array(particleCount);
-        const velocities = new Float32Array(particleCount * 3);
-
-        // Bright, cheerful colors for kids
         const colorPalette = [
-            new THREE.Color(0xff6b9d), // Pink
-            new THREE.Color(0xffd93d), // Yellow
-            new THREE.Color(0x6bcf7f), // Green
-            new THREE.Color(0x4ecdc4), // Cyan
-            new THREE.Color(0xc44569), // Red
-            new THREE.Color(0x95e1d3), // Mint
-            new THREE.Color(0xf8b500), // Orange
-            new THREE.Color(0x9b59b6), // Purple
-        ];
+            0xff1493, 0xffd700, 0x00ff7f, 0x00bfff,
+            0xff69b4, 0x7fff00, 0xff8c00, 0xda70d6,
+            0xffff00, 0xff00ff
+        ].map(hex => new THREE.Color(hex));
 
-        for (let i = 0; i < particleCount; i++) {
-            const i3 = i * 3;
+        const createParticles = (count: number, size: number, shapeType: number) => {
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+            const velocities: number[][] = [];
+            const phases = new Float32Array(count);
 
-            // Random position
-            positions[i3] = (Math.random() - 0.5) * 60;
-            positions[i3 + 1] = (Math.random() - 0.5) * 60;
-            positions[i3 + 2] = (Math.random() - 0.5) * 20;
-
-            // Random color from palette
-            const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-            colors[i3] = color.r;
-            colors[i3 + 1] = color.g;
-            colors[i3 + 2] = color.b;
-
-            // Random size
-            sizes[i] = Math.random() * 2 + 1;
-
-            // Random velocity
-            velocities[i3] = (Math.random() - 0.5) * 0.02;
-            velocities[i3 + 1] = (Math.random() * 0.02) + 0.01; // Upward bias
-            velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-
-        // Particle material with texture
-        const material = new THREE.PointsMaterial({
-            size: 3,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.8,
-            sizeAttenuation: true,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false,
-        });
-
-        const particles = new THREE.Points(geometry, material);
-        scene.add(particles);
-        particlesRef.current = particles;
-
-        // Animation
-        const animate = () => {
-            animationIdRef.current = requestAnimationFrame(animate);
-
-            const positions = particles.geometry.attributes.position.array as Float32Array;
-
-            for (let i = 0; i < particleCount; i++) {
+            for (let i = 0; i < count; i++) {
                 const i3 = i * 3;
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 5;
 
-                // Update position with velocity
-                positions[i3] += velocities[i3];
-                positions[i3 + 1] += velocities[i3 + 1];
-                positions[i3 + 2] += velocities[i3 + 2];
+                positions[i3] = Math.cos(angle) * radius;
+                positions[i3 + 1] = Math.sin(angle) * radius;
+                positions[i3 + 2] = (Math.random() - 0.5) * 8;
 
-                // Wrap around - when particles go off screen, respawn at bottom
-                if (positions[i3 + 1] > 30) {
-                    positions[i3 + 1] = -30;
-                    positions[i3] = (Math.random() - 0.5) * 60;
-                    positions[i3 + 2] = (Math.random() - 0.5) * 20;
-                }
+                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                colors[i3] = color.r;
+                colors[i3 + 1] = color.g;
+                colors[i3 + 2] = color.b;
 
-                // Side wrapping
-                if (Math.abs(positions[i3]) > 30) {
-                    positions[i3] = -Math.sign(positions[i3]) * 30;
-                }
-                if (Math.abs(positions[i3 + 2]) > 10) {
-                    positions[i3 + 2] = -Math.sign(positions[i3 + 2]) * 10;
-                }
+                sizes[i] = Math.random() * size + size * 0.5;
+
+                const speed = Math.random() * 0.2 + 0.05;
+                const vAngle = Math.random() * Math.PI * 2;
+                velocities.push([
+                    Math.cos(vAngle) * speed * 0.5,
+                    Math.random() * 0.1 + 0.03,
+                    Math.sin(vAngle) * speed * 0.3,
+                ]);
+
+                phases[i] = Math.random() * Math.PI * 2;
             }
 
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.rotation.y += 0.001;
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const shapeCanvas = document.createElement('canvas');
+            shapeCanvas.width = 64;
+            shapeCanvas.height = 64;
+            const ctx = shapeCanvas.getContext('2d')!;
+            ctx.fillStyle = 'white';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = 'white';
+
+            if (shapeType === 0) { // star
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const ang = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                    ctx.lineTo(32 + Math.cos(ang) * 25, 32 + Math.sin(ang) * 25);
+                }
+                ctx.closePath();
+                ctx.fill();
+            } else if (shapeType === 1) { // circle
+                const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+                grad.addColorStop(0, 'rgba(255,255,255,1)');
+                grad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = grad;
+                ctx.arc(32, 32, 28, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (shapeType === 2) { // heart
+                ctx.beginPath();
+                ctx.moveTo(32, 25);
+                ctx.bezierCurveTo(32, 20, 28, 16, 24, 16);
+                ctx.bezierCurveTo(16, 16, 16, 24, 16, 24);
+                ctx.bezierCurveTo(16, 32, 32, 44, 32, 44);
+                ctx.bezierCurveTo(32, 44, 48, 32, 48, 24);
+                ctx.bezierCurveTo(48, 24, 48, 16, 40, 16);
+                ctx.bezierCurveTo(36, 16, 32, 20, 32, 25);
+                ctx.fill();
+            } else { // spark
+                ctx.beginPath();
+                ctx.moveTo(32, 8);
+                ctx.lineTo(56, 32);
+                ctx.lineTo(32, 56);
+                ctx.lineTo(8, 32);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            const texture = new THREE.CanvasTexture(shapeCanvas);
+            const material = new THREE.PointsMaterial({
+                size: 6,
+                map: texture,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.7,
+                sizeAttenuation: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+            });
+
+            const points = new THREE.Points(geometry, material);
+            (points as any).velocities = velocities;
+            (points as any).phases = phases;
+            (points as any).originalSizes = new Float32Array(sizes);
+            return points;
+        };
+
+        const particles = [
+            createParticles(40, 2.5, 0),
+            createParticles(35, 2, 1),
+            createParticles(25, 3, 2),
+            createParticles(45, 1.8, 3),
+        ];
+
+        particles.forEach(p => scene.add(p));
+
+        let time = 0;
+        let animationId: number;
+
+        const animate = () => {
+            animationId = requestAnimationFrame(animate);
+            time += 0.016;
+
+            particles.forEach((points, idx) => {
+                const pos = points.geometry.attributes.position.array as Float32Array;
+                const sizeArr = points.geometry.attributes.size.array as Float32Array;
+                const vel = (points as any).velocities;
+                const ph = (points as any).phases;
+                const origSizes = (points as any).originalSizes;
+                const cnt = pos.length / 3;
+
+                for (let i = 0; i < cnt; i++) {
+                    const i3 = i * 3;
+                    pos[i3] += vel[i][0];
+                    pos[i3 + 1] += vel[i][1];
+                    pos[i3 + 2] += vel[i][2];
+
+                    sizeArr[i] = origSizes[i] * (Math.sin(time * 2 + ph[i]) * 0.3 + 1);
+
+                    if (pos[i3 + 1] > 20) {
+                        pos[i3 + 1] = -5;
+                        pos[i3] = (Math.random() - 0.5) * 25;
+                        pos[i3 + 2] = (Math.random() - 0.5) * 10;
+                    }
+                    if (Math.abs(pos[i3]) > 15) pos[i3] = -Math.sign(pos[i3]) * 15;
+                    if (Math.abs(pos[i3 + 2]) > 8) pos[i3 + 2] = -Math.sign(pos[i3 + 2]) * 8;
+                }
+
+                points.geometry.attributes.position.needsUpdate = true;
+                points.geometry.attributes.size.needsUpdate = true;
+                points.rotation.y += 0.001 * (idx + 1);
+                points.rotation.z += 0.0005;
+            });
 
             renderer.render(scene, camera);
         };
 
         animate();
 
-        // Handle resize
-        const handleResize = () => {
-            if (!canvas || !renderer) return;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        // Cleanup
         return () => {
-            window.removeEventListener('resize', handleResize);
-            if (animationIdRef.current) {
-                cancelAnimationFrame(animationIdRef.current);
-            }
-            if (rendererRef.current) {
-                rendererRef.current.dispose();
-            }
-            geometry.dispose();
-            material.dispose();
+            cancelAnimationFrame(animationId);
+            renderer.dispose();
+            particles.forEach(p => {
+                p.geometry.dispose();
+                (p.material as THREE.Material).dispose();
+            });
         };
     }, [isActive]);
 
-    if (!isActive) return null;
-
-    return (
-        <canvas
-            ref={canvasRef}
-            className="fixed top-0 right-0 w-1/2 h-full pointer-events-none z-10"
-            style={{ opacity: 0.7 }}
-        />
-    );
+    return null;
 };
 
 export default ParticleEffect;

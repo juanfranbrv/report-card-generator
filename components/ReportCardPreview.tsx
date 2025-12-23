@@ -22,8 +22,17 @@ const ReportCardPreview = forwardRef<HTMLDivElement, Props>(({ data, isInfantil 
             Student Report Card
           </h1>
         </div>
-        <div className="w-40 text-right">
-          <img src={`${import.meta.env.BASE_URL}logoweb1.png`} alt="Bauset Centro de Estudios" className="w-full h-auto" />
+        <div className="w-40 text-right relative">
+          {isInfantil && (
+            <div className="absolute inset-0 overflow-visible pointer-events-none z-20">
+              <canvas
+                id="logo-particles"
+                className="w-full h-full"
+                style={{ opacity: 0.7 }}
+              />
+            </div>
+          )}
+          <img src={`${import.meta.env.BASE_URL}logoweb1.png`} alt="Bauset Centro de Estudios" className="w-full h-auto relative z-10" />
         </div>
       </div>
 

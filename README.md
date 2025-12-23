@@ -11,6 +11,8 @@ Generador de boletas de calificación personalizado con integración de IA para 
 - 🎨 Preview en tiempo real del reporte
 - 📑 Layout optimizado para una sola página A4
 - 🧪 Botón de datos de prueba para testing rápido
+- 👶 **Modo Infantil:** Toggle que oculta calificaciones de Listening/Speaking para estudiantes más pequeños
+- ✨ **Efecto de partículas:** Celebración visual con Three.js cuando se activa el modo Infantil
 
 ## 🚀 Desarrollo Local
 
@@ -127,6 +129,7 @@ Los archivos compilados estarán en la carpeta `dist/`
 - **IA:** Google Gemini API
 - **PDF:** window.print() nativo del navegador
 - **Icons:** Lucide React
+- **3D Graphics:** Three.js (para efectos de partículas)
 
 ## 📁 Estructura del Proyecto
 
