@@ -10,19 +10,21 @@ if (Test-Path ".env.local") {
     }
 }
 else {
-    Write-Host "⚠️  ERROR: .env.local file not found!" -ForegroundColor Red
+    Write-Host "ERROR: .env.local file not found!" -ForegroundColor Red
     Write-Host "Create .env.local with: VITE_GEMINI_API_KEY=your_key_here" -ForegroundColor Yellow
     exit 1
 }
 
 if (-not $env:VITE_GEMINI_API_KEY) {
-    Write-Host "⚠️  ERROR: VITE_GEMINI_API_KEY not found in .env.local!" -ForegroundColor Red
+    Write-Host "ERROR: VITE_GEMINI_API_KEY not found in .env.local!" -ForegroundColor Red
     exit 1
 }
 
 # Build the project
 npm run build
 
-Write-Host "`n✅ Build completado con API key embebida" -ForegroundColor Green
-Write-Host "📁 Archivos listos en: dist/" -ForegroundColor Cyan
-Write-Host "`nSube el contenido de 'dist' a Hostinger por FTP" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Build completado con API key embebida" -ForegroundColor Green
+Write-Host "Archivos listos en: dist/" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Sube el contenido de 'dist' a Hostinger por FTP" -ForegroundColor Yellow
