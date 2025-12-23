@@ -3,8 +3,10 @@ import { GoogleGenAI } from "@google/genai";
 import { ReportData } from "../types";
 
 export const generateFeedback = async (data: ReportData): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
+  // API Key hardcoded for production deployment
+  const API_KEY = "AIzaSyD3cd1ju0JXoL0Gf5FSZZ3_rv7i4lwncSA";
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
+
   const prompt = `
     Como profesor/a profesional, escribe un comentario de feedback personalizado, constructivo y alentador para el boletín de notas de un estudiante.
     
